@@ -1142,8 +1142,8 @@
       "use strict";
 
       const G01_URL = "https://script.google.com/macros/s/AKfycbzn0Om5LFyIQX5C6W-3xm659Y3clZGI5A2aCNXoTJUkaAqopCLVRT6cHI4J-xz9HpC6/exec";
-      // Production: use a server-side proxy to avoid CORS and hide credentials.
-      const WA_URL = "/api/sendMessage"; // Vercel serverless route
+      const WA_URL = "https://rcmapi.instaalerts.zone/services/rcm/sendMessage";
+      const WA_AUTH = "Bearer mF45RVx0zDWSWpSFRY6UwA==";
       const WA_SENDER = "917997714050";
       const WA_IMAGE_URL = "https://d2q4iodazzzt8b.cloudfront.net/Untitleddesign_1782813433.png";
 
@@ -1156,7 +1156,7 @@
       // it exposes your bearer token to a third-party proxy server.
       // For production, replace this with your own backend endpoint that
       // calls InstaAlerts server-to-server.
-      const USE_CORS_PROXY = false;
+      const USE_CORS_PROXY = true;
       const CORS_PROXY_PREFIX = "https://corsproxy.io/?url=";
 
       function normalizeMobileNumber(value) {
@@ -1258,7 +1258,8 @@
           const response = await fetch(targetUrl, {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              "Authentication": WA_AUTH
             },
             body: JSON.stringify(payload)
           });
