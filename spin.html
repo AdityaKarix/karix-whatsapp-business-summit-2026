@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karix — Spin to Win</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --oxford: #070E28;
+      --royal: #150E75;
+      --pink: #D5468E;
+      --green: #58B767;
+      --gray: #494949;
+      --lgray: #F5F5F5;
+      --white: #FFFFFF;
+      --penn: #11225F;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--oxford);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Background pattern ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(213, 70, 142, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(21, 14, 117, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(88, 183, 103, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 26px;
+      /* adjust as needed */
+      width: auto;
+      display: block;
+    }
+
+    .header-badge {
+      background: rgba(213, 70, 142, 0.15);
+      border: 1px solid rgba(213, 70, 142, 0.3);
+      color: #D5468E;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      padding: 40px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-text {
+      text-align: center;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+    }
+
+    .hero-text h1 span {
+      color: var(--pink);
+    }
+
+    .hero-text p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 10px;
+      font-weight: 400;
+    }
+
+    /* ── Wheel wrapper ── */
+    .wheel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 520px;
+      height: 520px;
+    }
+
+    /* Outer glow ring */
+    .wheel-container::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg,
+          rgba(213, 70, 142, 0.85),
+          rgba(237, 128, 186, 0.5),
+          rgba(21, 14, 117, 0.85),
+          rgba(88, 183, 103, 0.55),
+          rgba(213, 70, 142, 0.85));
+      filter: blur(0.5px);
+      animation: spin-ring 8s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes spin-ring {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Inner mask to make glow ring thin */
+    .wheel-container::after {
+      content: '';
+      position: absolute;
+      inset: 0px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #0c1638 0%, #050a1f 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        inset 0 2px 18px rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+
+    #wheel-canvas {
+      position: relative;
+      z-index: 2;
+      border-radius: 50%;
+      filter: drop-shadow(0 12px 32px rgba(7, 14, 40, 0.55));
+    }
+
+    /* Pointer/arrow */
+    .wheel-pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: 34px;
+      height: 42px;
+      background: linear-gradient(180deg, #D5468E 0%, #D5468E 55%, #A52F6E 100%);
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      border-radius: 4px;
+      filter: drop-shadow(0 4px 10px rgba(213, 70, 142, 0.55));
+    }
+
+    .wheel-pointer::after {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #D5468E 55%, #A52F6E);
+      box-shadow: 0 2px 8px rgba(213, 70, 142, 0.5);
+    }
+
+    /* ── Spin button ── */
+    .spin-btn {
+      background: var(--pink);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 16px 52px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: transform 0.15s ease, background 0.2s ease;
+      box-shadow: 0 4px 20px rgba(213, 70, 142, 0.35);
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      background: #E83591;
+      box-shadow: 0 6px 28px rgba(213, 70, 142, 0.5);
+    }
+
+    .spin-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* ── Prize list ── */
+    .prize-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .prize-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .prize-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .prize-item span {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 14, 40, 0.85);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      animation: modal-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      background: var(--royal);
+      padding: 24px 28px;
+      text-align: center;
+    }
+
+    .modal-header .winner-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #D5468E;
+      margin-bottom: 6px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.3;
+    }
+
+    /* Better Luck variant */
+    .modal-header.better-luck {
+      background: var(--oxford);
+    }
+
+    .modal-header.better-luck .winner-label {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .modal-body {
+      padding: 28px;
+    }
+
+    .modal-body p.subtitle {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 22px;
+      line-height: 1.55;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--oxford);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #E0E0E0;
+      border-radius: 8px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--oxford);
+      background: #FAFAFA;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--royal);
+      background: var(--white);
+    }
+
+    .form-group input.prize-field {
+      background: #F0F3FF;
+      color: var(--royal);
+      border-color: #C5CBEA;
+      font-weight: 700;
+      cursor: not-allowed;
+    }
+
+    .form-error {
+      font-size: 12px;
+      color: #C0392B;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* Submit button */
+    .submit-btn {
+      width: 100%;
+      background: var(--royal);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      background: #D5468E;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Success state */
+    .success-view {
+      display: none;
+      text-align: center;
+      padding: 36px 28px;
+    }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      background: #EBF8EE;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .success-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--green);
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .success-view h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--oxford);
+      margin-bottom: 10px;
+    }
+
+    .success-view p {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    .success-view .close-btn {
+      margin-top: 24px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 32px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    /* ── Footer ── */
+    footer {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 12px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .wheel-container {
+        width: 300px;
+        height: 300px;
+      }
+
+      header {
+        padding: 16px 20px;
+      }
+
+      .hero-text h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════ CONFETTI CANVAS ═══════════ -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header>
+    <div class="logo">
+      <img
+        src="https://cdn.prod.website-files.com/68c6698e3517c4af35b889cf/68d8019bf5fa5f83c9defd4d_Karix%20white%20logo.webp">
+    </div>
+    <span class="header-badge">Spin to Win</span>
+  </header>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main>
+    <div class="hero-text">
+      <h1>Spin the wheel.<br><span>Claim your reward.</span></h1>
+      <p>One spin. Real prizes. Just for you.</p>
+    </div>
+
+    <div class="wheel-section">
+      <div class="wheel-container" id="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <canvas id="wheel-canvas" width="520" height="520"></canvas>
+      </div>
+      <button class="spin-btn" id="spin-btn" onclick="startSpin()">Spin the Wheel</button>
+    </div>
+
+    <!-- Prize key -->
+    <div class="prize-list" id="prize-legend"></div>
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer>© 2026 Karix Mobile Pvt. Ltd. · Tanla Company</footer>
+
+  <!-- ═══════════ MODAL ═══════════ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+
+      <div class="modal-header" id="modal-header">
+        <p class="winner-label" id="winner-label">You Won!</p>
+        <h2 id="prize-display">Prize Name</h2>
+      </div>
+
+      <div class="modal-body" id="form-view">
+        <p class="subtitle" id="modal-subtitle">
+          Fill in your details below and we'll confirm your prize via WhatsApp.
+        </p>
+
+        <form id="prize-form" onsubmit="handleSubmit(event)" novalidate>
+          <div class="form-group">
+            <label for="f-name">Full Name</label>
+            <input type="text" id="f-name" placeholder="Priya Sharma" autocomplete="name" required>
+            <span class="form-error" id="err-name">Please enter your name.</span>
+          </div>
+          <div class="form-group">
+            <label for="f-email">Phone Number</label>
+            <input type="tel" id="f-phone" placeholder="9876543210" autocomplete="tel" pattern="[6-9][0-9]{9}"
+              maxlength="10" required> <span class="form-error" id="err-email">Please enter a valid phone number.</span>
+          </div>
+          <div class="form-group">
+            <label for="f-email">Work Email</label>
+            <input type="email" id="f-email" placeholder="priya@company.com" autocomplete="email" required>
+            <span class="form-error" id="err-email">Please enter a valid email.</span>
+          </div>
+          <div class="form-group">
+            <label for="f-company">Company</label>
+            <input type="text" id="f-company" placeholder="Acme Corp" autocomplete="organization" required>
+            <span class="form-error" id="err-company">Please enter your company name.</span>
+          </div>
+          <div class="form-group">
+            <label for="f-prize">Your Prize</label>
+            <input type="text" id="f-prize" class="prize-field" readonly tabindex="-1">
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">Claim My Prize</button>
+        </form>
+      </div>
+
+      <div class="success-view" id="success-view">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h3>You're all set!</h3>
+        <p>Check your inbox — we've sent confirmation details to your WhatsApp. Our team will be in touch within 2
+          business
+          days.</p>
+        <button class="close-btn" onclick="closeModal()">Done</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // CONFIG — Replace with your deployed Apps Script Web App URL
+    // ═══════════════════════════════════════════════════════════
+    const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    // ═══════════════════════════════════════════════════════════
+    // PRIZES
+    // ═══════════════════════════════════════════════════════════
+    const PRIZES = [
+      {
+        label: "WA Business Calling",
+        sublabel: "1st Campaign Free *Upto Rs.30,000",
+        color: "#150E75",   // Royal Blue
+        text: "#FFFFFF",
+        dot: "#150E75",
+        weight: 20,
+      },
+      {
+        label: "Marketing Cost Optimiser",
+        sublabel: "Delivery Rate + Cost Reduction",
+        color: "#D5468E",   // Deep Pink
+        text: "#FFFFFF",
+        dot: "#D5468E",
+        weight: 20,
+      },
+      {
+        label: "Service Fee Waiver",
+        sublabel: "*Worth Rs 50,000",
+        color: "#58B767",   // Emerald Green
+        text: "#FFFFFF",
+        dot: "#58B767",
+        weight: 20,
+      },
+      {
+        label: "Premium Hamper",
+        sublabel: "Win a Gift Hamper",
+        color: "#11225F",   // Penn Blue
+        text: "#FFFFFF",
+        dot: "#11225F",
+        weight: 20,
+      },
+      {
+        label: "Better Luck Next Time 😞",
+        sublabel: "",
+        color: "#494949",   // Gray
+        text: "#FFFFFF",
+        dot: "#888888",
+        weight: 20,
+      },
+    ];
+
+    // ═══════════════════════════════════════════════════════════
+    // WHEEL ENGINE
+    // ═══════════════════════════════════════════════════════════
+    const canvas = document.getElementById("wheel-canvas");
+    const ctx = canvas.getContext("2d");
+    let currentAngle = 0;
+    let isSpinning = false;
+    let hasSpun = false;
+    let wonPrizeIndex = -1;
+    let fontsReady = false;
+
+    // Compute segment angles from weights
+    const totalWeight = PRIZES.reduce((s, p) => s + p.weight, 0);
+    const segments = [];
+    let cumulative = 0;
+    PRIZES.forEach((prize, i) => {
+      const fraction = prize.weight / totalWeight;
+      segments.push({
+        prize,
+        startFrac: cumulative,
+        endFrac: cumulative + fraction,
+        midFrac: cumulative + fraction / 2,
+      });
+      cumulative += fraction;
+    });
+
+    function drawWheel(angle) {
+      const SIZE = canvas._logicalSize || canvas.width;
+      const CX = SIZE / 2;
+      const CY = SIZE / 2;
+      const RADIUS = SIZE / 2 - 10;
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      // Outer rim ring (metallic)
+      const rim = ctx.createLinearGradient(0, 0, 0, SIZE);
+      rim.addColorStop(0, "#3a2f6a");
+      rim.addColorStop(0.5, "#0d1338");
+      rim.addColorStop(1, "#3a2f6a");
+      ctx.beginPath();
+      ctx.arc(CX, CY, RADIUS + 8, 0, 2 * Math.PI);
+      ctx.fillStyle = rim;
+      ctx.fill();
+
+      segments.forEach(seg => {
+        const startAngle = angle + seg.startFrac * 2 * Math.PI;
+        const endAngle = angle + seg.endFrac * 2 * Math.PI;
+        const midAngle = angle + seg.midFrac * 2 * Math.PI;
+
+        // Segment radial gradient fill — lighter centre, brighter edge
+        const mx = CX + Math.cos(midAngle) * RADIUS * 0.55;
+        const my = CY + Math.sin(midAngle) * RADIUS * 0.55;
+        const grad = ctx.createRadialGradient(CX, CY, RADIUS * 0.12, mx, my, RADIUS);
+        const base = seg.prize.color;
+        grad.addColorStop(0, shade(base, 28));
+        grad.addColorStop(0.55, shade(base, 8));
+        grad.addColorStop(1, shade(base, -18));
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, RADIUS, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Divider line — bright bevel
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.lineTo(
+          CX + RADIUS * Math.cos(startAngle),
+          CY + RADIUS * Math.sin(startAngle)
+        );
+        ctx.strokeStyle = "rgba(255,255,255,0.28)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Label — rotated radially, anchored to outer edge
+        ctx.save();
+        ctx.translate(CX, CY);
+        ctx.rotate(midAngle);
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        const fraction = seg.prize.weight / totalWeight;
+        const fontFam = fontsReady ? "'Manrope', sans-serif" : "system-ui, sans-serif";
+        const scale = SIZE / 520;                      // base layout @ 520px
+        const fontMain = (fraction > 0.18 ? 16 : fraction > 0.12 ? 14 : 12) * scale;
+        const fontSub = 10 * scale;
+        const lineH = fontMain * 1.15;
+        const textR = RADIUS - 22 * scale;              // anchor near outer edge
+
+        // Wrap main label into 2 lines max
+        const words = seg.prize.label.split(" ");
+        let lines;
+        if (words.length <= 1 || seg.prize.label.length < 14) {
+          lines = [seg.prize.label];
+        } else {
+          const mid = Math.ceil(words.length / 2);
+          lines = [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
+        }
+
+        const subOffset = (seg.prize.sublabel && fraction > 0.12) ? fontSub + 4 * scale : 0;
+        const totalH = lines.length * lineH + subOffset;
+        const startY = -totalH / 2 + lineH / 2;
+
+        // Text shadow for legibility on any segment colour
+        ctx.shadowColor = "rgba(0,0,0,0.55)";
+        ctx.shadowBlur = 4 * scale;
+        ctx.shadowOffsetY = 1 * scale;
+
+        ctx.font = `800 ${fontMain}px ${fontFam}`;
+        ctx.fillStyle = seg.prize.text;
+        lines.forEach((line, li) => {
+          ctx.fillText(line, textR, startY + li * lineH);
+        });
+
+        if (seg.prize.sublabel && fraction > 0.12) {
+          ctx.font = `500 ${fontSub}px ${fontFam}`;
+          ctx.fillStyle = "rgba(255,255,255,0.85)";
+          ctx.fillText(
+            seg.prize.sublabel,
+            textR,
+            startY + lines.length * lineH + 2 * scale
+          );
+        }
+
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.restore();
+      });
+
+      // Glossy top highlight overlay
+      const gloss = ctx.createRadialGradient(CX, CY - RADIUS * 0.55, 10, CX, CY - RADIUS * 0.2, RADIUS);
+      gloss.addColorStop(0, "rgba(255,255,255,0.18)");
+      gloss.addColorStop(0.5, "rgba(255,255,255,0.03)");
+      gloss.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.beginPath();
+      ctx.arc(CX, CY, RADIUS, 0, 2 * Math.PI);
+      ctx.fillStyle = gloss;
+      ctx.fill();
+
+      // Inner rim line
+      ctx.beginPath();
+      ctx.arc(CX, CY, RADIUS - 0.5, 0, 2 * Math.PI);
+      ctx.strokeStyle = "rgba(255,255,255,0.18)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Center hub — outer metallic ring
+      const hubR = SIZE * 0.085;
+      const hubGrad = ctx.createLinearGradient(CX - hubR, CY - hubR, CX + hubR, CY + hubR);
+      hubGrad.addColorStop(0, "#3a2f6a");
+      hubGrad.addColorStop(0.5, "#0a1030");
+      hubGrad.addColorStop(1, "#3a2f6a");
+      ctx.beginPath();
+      ctx.arc(CX, CY, hubR, 0, 2 * Math.PI);
+      ctx.fillStyle = hubGrad;
+      ctx.fill();
+
+      // Inner hub disc
+      const innerR = hubR * 0.78;
+      const inner = ctx.createRadialGradient(CX - innerR * 0.2, CY - innerR * 0.3, innerR * 0.1, CX, CY, innerR);
+      inner.addColorStop(0, "#1a2350");
+      inner.addColorStop(1, "#070E28");
+      ctx.beginPath();
+      ctx.arc(CX, CY, innerR, 0, 2 * Math.PI);
+      ctx.fillStyle = inner;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.18)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Pink jewel dot
+      const jewelR = innerR * 0.32;
+      const dot = ctx.createRadialGradient(CX - jewelR * 0.3, CY - jewelR * 0.4, 1, CX, CY, jewelR);
+      dot.addColorStop(0, "#ffd1e6");
+      dot.addColorStop(0.4, "#D5468E");
+      dot.addColorStop(1, "#A52F6E");
+      ctx.beginPath();
+      ctx.arc(CX, CY, jewelR, 0, 2 * Math.PI);
+      ctx.fillStyle = dot;
+      ctx.fill();
+    }
+
+    // Lighten/darken a hex color by percent (-100..100)
+    function shade(hex, percent) {
+      const h = hex.replace("#", "");
+      const num = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
+      let r = (num >> 16) & 0xff, g = (num >> 8) & 0xff, b = num & 0xff;
+      const t = percent < 0 ? 0 : 255;
+      const p = Math.abs(percent) / 100;
+      r = Math.round((t - r) * p) + r;
+      g = Math.round((t - g) * p) + g;
+      b = Math.round((t - b) * p) + b;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // Resize wheel canvas for mobile
+    function resizeWheel() {
+      const wrap = document.getElementById("wheel-wrap");
+      const avail = Math.min(wrap.parentElement.offsetWidth - 48, 520);
+      const s = Math.max(avail, 260);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = s * dpr;
+      canvas.height = s * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Override canvas.width getter usage in drawWheel by setting style first
+      canvas.style.width = s + "px";
+      canvas.style.height = s + "px";
+      wrap.style.width = s + "px";
+      wrap.style.height = s + "px";
+      // Stash logical size for drawWheel
+      canvas._logicalSize = s;
+      drawWheel(currentAngle);
+    }
+
+    window.addEventListener("resize", resizeWheel);
+
+    // Wait for the web font before first draw so labels use Manrope
+    if (document.fonts && document.fonts.load) {
+      Promise.all([
+        document.fonts.load("800 16px Manrope"),
+        document.fonts.load("500 10px Manrope"),
+      ]).then(() => { fontsReady = true; drawWheel(currentAngle); })
+        .catch(() => { fontsReady = true; drawWheel(currentAngle); });
+    }
+
+    // Build prize legend
+    function buildLegend() {
+      const legend = document.getElementById("prize-legend");
+      PRIZES.forEach(p => {
+        const item = document.createElement("div");
+        item.className = "prize-item";
+        item.innerHTML = `
+      <span class="prize-dot" style="background:${p.dot}"></span>
+      <span>${p.label}${p.sublabel ? " — " + p.sublabel : ""}</span>`;
+        legend.appendChild(item);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // WEIGHTED RANDOM SELECTION
+    // ═══════════════════════════════════════════════════════════
+    function pickWeightedIndex() {
+      const r = Math.random();
+      for (let i = 0; i < segments.length; i++) {
+        if (r >= segments[i].startFrac && r < segments[i].endFrac) return i;
+      }
+      return segments.length - 1;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // SPIN ANIMATION
+    // ═══════════════════════════════════════════════════════════
+    function startSpin() {
+      if (isSpinning || hasSpun) return;
+      isSpinning = true;
+      document.getElementById("spin-btn").disabled = true;
+
+      // Pick winner
+      wonPrizeIndex = pickWeightedIndex();
+      const seg = segments[wonPrizeIndex];
+
+      // We want the pointer (at top = -π/2) to land in segment midpoint
+      // Pointer is at angle = -Math.PI/2 in absolute terms
+      // Target absolute angle of segment mid = seg.midFrac * 2 * PI
+      // We add full rotations for drama
+
+      const minRotations = 5;
+      const extraRotation = (minRotations + Math.floor(Math.random() * 3)) * 2 * Math.PI;
+      const pointerAngle = -Math.PI / 2;
+
+      // Current angle offset that places seg.midFrac at pointer
+      const targetMidRaw = pointerAngle - seg.midFrac * 2 * Math.PI;
+      const targetAngleFinal = currentAngle + extraRotation + (targetMidRaw - currentAngle % (2 * Math.PI) + 4 * Math.PI) % (2 * Math.PI);
+
+      const startAngle = currentAngle;
+      const angleDelta = targetAngleFinal - startAngle;
+      const duration = 4800;
+      let startTime = null;
+
+      function easeOut(t) {
+        return 1 - Math.pow(1 - t, 4);
+      }
+
+      function animate(ts) {
+        if (!startTime) startTime = ts;
+        const elapsed = ts - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        currentAngle = startAngle + angleDelta * easeOut(progress);
+
+        drawWheel(currentAngle);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = true; // keep disabled
+          hasSpun = true;
+          setTimeout(showModal, 500);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // MODAL
+    // ═══════════════════════════════════════════════════════════
+    function showModal() {
+      const prize = PRIZES[wonPrizeIndex];
+      const isBadLuck = prize.label.toLowerCase().includes("better luck");
+      const fullLabel = prize.sublabel ? `${prize.label} — ${prize.sublabel}` : prize.label;
+
+      document.getElementById("prize-display").textContent = fullLabel;
+      document.getElementById("f-prize").value = fullLabel;
+
+      const header = document.getElementById("modal-header");
+      if (isBadLuck) {
+        header.classList.add("better-luck");
+        document.getElementById("winner-label").textContent = "Result";
+        document.getElementById("modal-subtitle").textContent =
+          "We'd still love to connect! Fill in your details and our team will reach out to explore how Karix can help your business.";
+      } else {
+        header.classList.remove("better-luck");
+        document.getElementById("winner-label").textContent = "You Won!";
+        document.getElementById("modal-subtitle").textContent =
+          "Fill in your details and we'll confirm your prize via email within 2 business days.";
+      }
+
+      document.getElementById("modal-overlay").classList.add("active");
+
+      if (!isBadLuck) launchConfetti();
+    }
+
+    function closeModal() {
+      document.getElementById("modal-overlay").classList.remove("active");
+      stopConfetti();
+    }
+
+    // Close on backdrop click
+    document.getElementById("modal-overlay").addEventListener("click", function (e) {
+      if (e.target === this) closeModal();
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // FORM SUBMISSION
+    // ═══════════════════════════════════════════════════════════
+    function handleSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("f-name").value.trim();
+      const email = document.getElementById("f-email").value.trim();
+      const company = document.getElementById("f-company").value.trim();
+      const prize = document.getElementById("f-prize").value.trim();
+
+      // Validate
+      let valid = true;
+      function setErr(id, errId, show) {
+        document.getElementById(errId).style.display = show ? "block" : "none";
+        document.getElementById(id).style.borderColor = show ? "#C0392B" : "";
+        if (show) valid = false;
+      }
+
+      setErr("f-name", "err-name", !name);
+      setErr("f-email", "err-email", !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+      setErr("f-company", "err-company", !company);
+
+      if (!valid) return;
+
+      const btn = document.getElementById("submit-btn");
+      btn.disabled = true;
+      btn.textContent = "Submitting…";
+
+      // ── Backend submission is now handled by the G01 / WhatsApp
+      //    integration script appended at the bottom of this file
+      //    (fired via the separate "submit" listener on #prize-form).
+      //    That script runs callG01()/callWA01()/callWA02()/callWA03()
+      //    in parallel without blocking the UI, so we just show the
+      //    success view immediately here. ──
+      showSuccess();
+      btn.disabled = false;
+      btn.textContent = "Claim My Prize";
+    }
+
+    function showSuccess() {
+      document.getElementById("form-view").style.display = "none";
+      document.getElementById("success-view").style.display = "block";
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // CONFETTI
+    // ═══════════════════════════════════════════════════════════
+    const confCanvas = document.getElementById("confetti-canvas");
+    const confCtx = confCanvas.getContext("2d");
+    let confParticles = [];
+    let confettiRAF = null;
+    const CONF_COLORS = ["#D5468E", "#150E75", "#58B767", "#F7CF46", "#FFFFFF", "#D5468E"];
+
+    function launchConfetti() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+      confParticles = [];
+
+      for (let i = 0; i < 140; i++) {
+        confParticles.push({
+          x: Math.random() * confCanvas.width,
+          y: -10,
+          size: Math.random() * 7 + 4,
+          color: CONF_COLORS[Math.floor(Math.random() * CONF_COLORS.length)],
+          vy: Math.random() * 3 + 2,
+          vx: (Math.random() - 0.5) * 3,
+          rot: Math.random() * 360,
+          rots: (Math.random() - 0.5) * 6,
+          shape: Math.random() > 0.5 ? "rect" : "circle",
+        });
+      }
+
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      confParticles.forEach(p => {
+        p.y += p.vy;
+        p.x += p.vx;
+        p.rot += p.rots;
+        confCtx.save();
+        confCtx.translate(p.x, p.y);
+        confCtx.rotate(p.rot * Math.PI / 180);
+        confCtx.fillStyle = p.color;
+        if (p.shape === "rect") {
+          confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.5);
+        } else {
+          confCtx.beginPath();
+          confCtx.arc(0, 0, p.size / 2, 0, 2 * Math.PI);
+          confCtx.fill();
+        }
+        confCtx.restore();
+      });
+
+      confParticles = confParticles.filter(p => p.y < confCanvas.height + 20);
+      if (confParticles.length > 0) {
+        confettiRAF = requestAnimationFrame(animateConfetti);
+      } else {
+        stopConfetti();
+      }
+    }
+
+    function stopConfetti() {
+      if (confettiRAF) cancelAnimationFrame(confettiRAF);
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      confParticles = [];
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════════
+    buildLegend();
+    resizeWheel();
+    drawWheel(currentAngle);
+  </script>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // ADDED INTEGRATION SCRIPT — G01 (Google Apps Script) + WhatsApp APIs
+    // This block only ADDS behavior on top of the existing form submit
+    // flow. It does not modify or replace any existing logic.
+    // ═══════════════════════════════════════════════════════════
+    (function () {
+      "use strict";
+
+      const G01_URL = "https://script.google.com/macros/s/AKfycbzn0Om5LFyIQX5C6W-3xm659Y3clZGI5A2aCNXoTJUkaAqopCLVRT6cHI4J-xz9HpC6/exec";
+      const WA_URL = "https://rcmapi.instaalerts.zone/services/rcm/sendMessage";
+      const WA_AUTH = "Bearer mF45RVx0zDWSWpSFRY6UwA==";
+      const WA_SENDER = "917997714050";
+      const WA_IMAGE_URL = "https://d2q4iodazzzt8b.cloudfront.net/Untitleddesign_1782813433.png";
+
+      // ⚠️ TESTING-ONLY WORKAROUND ⚠️
+      // InstaAlerts' API rejects direct browser CORS preflight requests
+      // (405 on OPTIONS) by design — this is a server-side restriction
+      // and cannot be fixed from client JS. Setting USE_CORS_PROXY = true
+      // routes the WA call through a public CORS proxy so you can see it
+      // work end-to-end in the browser. This is NOT safe for production:
+      // it exposes your bearer token to a third-party proxy server.
+      // For production, replace this with your own backend endpoint that
+      // calls InstaAlerts server-to-server.
+      const USE_CORS_PROXY = true;
+      const CORS_PROXY_PREFIX = "https://corsproxy.io/?url=";
+
+      function normalizeMobileNumber(value) {
+        const digits = String(value || "").replace(/\D/g, "");
+        if (digits.length === 10) {
+          return `91${digits}`;
+        }
+        if (digits.length === 12 && digits.startsWith("91")) {
+          return digits;
+        }
+        return digits;
+      }
+
+      function getFormValues() {
+        const fullNameEl = document.getElementById("f-name");
+        const mobileEl = document.getElementById("f-phone");
+        const emailEl = document.getElementById("f-email");
+        const companyEl = document.getElementById("f-company");
+        const prizeEl = document.getElementById("f-prize");
+
+        return {
+          full_name: fullNameEl ? fullNameEl.value.trim() : "",
+          mobile_number: normalizeMobileNumber(mobileEl ? mobileEl.value.trim() : ""),
+          email: emailEl ? emailEl.value.trim() : "",
+          company: companyEl ? companyEl.value.trim() : "",
+          your_prize: prizeEl ? prizeEl.value.trim() : ""
+        };
+      }
+
+      async function callG01(data) {
+        try {
+          const response = await fetch(G01_URL, {
+            method: "POST",
+            // Apps Script web apps don't implement doOptions(), so a
+            // CORS preflight (triggered by "Content-Type: application/json")
+            // gets rejected with 405. Sending as text/plain avoids the
+            // preflight; Apps Script can still JSON.parse(e.postData.contents).
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              mobilenumber: data.mobile_number,
+              email: data.email,
+              company: data.company,
+              your_prize: data.your_prize
+            })
+          });
+          console.log("[G01] Success:", response.status);
+          return response;
+        } catch (err) {
+          console.error("[G01] Failed:", err);
+          throw err;
+        }
+      }
+
+      function buildWaPayload(templateId, bodyParameterValues, mobile_number) {
+        return {
+          message: {
+            channel: "WABA",
+            content: {
+              preview_url: false,
+              type: "MEDIA_TEMPLATE",
+              mediaTemplate: {
+                templateId: templateId,
+                bodyParameterValues: bodyParameterValues,
+                buttons: {},
+                media: {
+                  type: "image",
+                  url: WA_IMAGE_URL
+                }
+              },
+              shorten_url: true
+            },
+            recipient: {
+              to: mobile_number,
+              recipient_type: "individual",
+              reference: {
+                cust_ref: "Some Customer Ref",
+                messageTag1: "Message Tag Val1",
+                conversationId: "Some Optional Conversation ID"
+              }
+            },
+            sender: {
+              from: WA_SENDER
+            },
+            preferences: {
+              webHookDNId: "1001"
+            }
+          },
+          metaData: {
+            version: "v1.0.9"
+          }
+        };
+      }
+
+      async function sendWhatsApp(payload, label) {
+        const targetUrl = USE_CORS_PROXY
+          ? CORS_PROXY_PREFIX + encodeURIComponent(WA_URL)
+          : WA_URL;
+        try {
+          const response = await fetch(targetUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authentication": WA_AUTH
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const bodyText = await response.text();
+            if (response.status === 405) {
+              console.error(
+                "[" + label + "] 405 Not Allowed — InstaAlerts is rejecting the " +
+                "browser CORS preflight server-side. This is not fixable from " +
+                "client JS; route this call through your own backend in production. " +
+                "(USE_CORS_PROXY=" + USE_CORS_PROXY + ")"
+              );
+            }
+            console.error("[" + label + "] Error:", response.status, bodyText);
+          } else {
+            console.log("[" + label + "] Success:", response.status);
+          }
+          return response;
+        } catch (err) {
+          console.error("[" + label + "] Failed:", err);
+          throw err;
+        }
+      }
+
+      async function callWA01(data) {
+        const payload = buildWaPayload(
+          "summit_1806",
+          { "0": data.full_name },
+          data.mobile_number
+        );
+        return sendWhatsApp(payload, "WA01");
+      }
+
+      async function callWA02(data) {
+        const payload = buildWaPayload(
+          "summit_1808",
+          { "0": data.full_name, "1": data.your_prize },
+          data.mobile_number
+        );
+        return sendWhatsApp(payload, "WA02");
+      }
+
+      async function callWA03(data) {
+        const payload = buildWaPayload(
+          "summit_1808",
+          { "0": data.full_name, "1": data.your_prize },
+          data.mobile_number
+        );
+        return sendWhatsApp(payload, "WA03");
+      }
+
+      function resolveWaCall(prizeLabel) {
+        const label = (prizeLabel || "").trim();
+
+        if (label.includes("Better Luck Next Time")) {
+          return callWA01;
+        }
+
+        const case2Prizes = [
+          "WA Business Calling",
+          "Marketing Cost Optimiser",
+          "Service Fee Waiver"
+        ];
+        if (case2Prizes.some(p => label.includes(p))) {
+          return callWA02;
+        }
+
+        if (label.includes("Premium Hamper")) {
+          return callWA03;
+        }
+
+        return null;
+      }
+
+      async function runIntegrations(data) {
+        const tasks = [callG01(data)];
+
+        const waFn = resolveWaCall(data.your_prize);
+        if (waFn) {
+          tasks.push(waFn(data));
+        } else {
+          console.warn("[WA] No matching WhatsApp template for prize:", data.your_prize);
+        }
+
+        const results = await Promise.allSettled(tasks);
+        results.forEach((result, i) => {
+          if (result.status === "rejected") {
+            console.error("[Integration task " + i + "] rejected:", result.reason);
+          }
+        });
+      }
+
+      const prizeForm = document.getElementById("prize-form");
+      if (prizeForm) {
+        // Additional listener — does not call preventDefault, does not
+        // interfere with the existing handleSubmit(event) flow which is
+        // still wired via the form's inline onsubmit attribute.
+        prizeForm.addEventListener("submit", function () {
+          const data = getFormValues();
+          // Fire-and-forget: run in parallel, never block the UI.
+          runIntegrations(data).catch(function (err) {
+            console.error("[Integrations] Unexpected error:", err);
+          });
+        });
+      } else {
+        console.error("[Integrations] prize-form not found in DOM.");
+      }
+    })();
+  </script>
+</body>
+
+</html>
